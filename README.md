@@ -4,4 +4,3 @@
 
 현재 개발보드는 NUCLEO-F446ZE 보드
 
-test
