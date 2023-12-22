@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
@@ -36,7 +37,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+IH_TelemetryDataTypeDef telemetry_data;
+char telemetry_string[DEF_TELEMETRY_STRING_SIZE];
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -91,7 +93,26 @@ int main(void)
   MX_GPIO_Init();
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
+  MX_TIM3_Init();
+  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim3);
+
+  // initializing telemetry data
+  strcpy(telemetry_data.STATE, "INITIALIZING");
+  telemetry_data.TEAM_ID = DEF_TELEMETRY_TEAM_ID;
+  telemetry_data.MISSION_TIME.HOUR = 13;
+  telemetry_data.MISSION_TIME.MINUTE = 45;
+  telemetry_data.MISSION_TIME.SECOND = 57;
+  // packet count is zero
+  telemetry_data.MODE = 'F';
+  // STATE initialized above
+  // no sensor data initialization: altitude, airspeed
+  telemetry_data.HS_DEPLOYED = 'N';
+  telemetry_data.PC_DEPLOYED = 'N';
+  // no sensor data initialization: temperature, voltage, pressure, GPS, tilt, rotation
+  strcpy(telemetry_data.CMD_ECHO, "NO_CMD");
+  // optional data initialization
 
   /* USER CODE END 2 */
 
@@ -153,6 +174,15 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
+	if (htim == &htim3){
+		IH_TelemetryData_GetString(telemetry_string, &telemetry_data);
+		if(HAL_UART_Transmit_IT(&huart2, telemetry_string, sizeof(telemetry_string))==HAL_OK){
+			telemetry_data.PACKET_COUNT++;
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		}
+	}
+}
 
 /* USER CODE END 4 */
 
