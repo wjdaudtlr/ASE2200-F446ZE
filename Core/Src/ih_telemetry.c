@@ -53,7 +53,9 @@ void IH_UTCTime_GetString(char* str, IH_UTCTimeTypeDef *IH_UTCTime){
 }
 // Telemetry
 void IH_TelemetryData_GetString(char* str, IH_TelemetryDataTypeDef *IH_TelemetryData){
-	int idx = 0;
+	int idx = 2;
+	str[0] = DEF_TELEMETRY_HEADER1;
+	str[1] = DEF_TELEMETRY_HEADER2;
 
 	idx += sprintf(str+idx, "%d", IH_TelemetryData->TEAM_ID);
 	str[idx] = ',';
@@ -138,5 +140,6 @@ void IH_TelemetryData_GetString(char* str, IH_TelemetryDataTypeDef *IH_Telemetry
 	idx++;
 
 	idx += sprintf(str+idx, "%s", IH_TelemetryData->CMD_ECHO);
-	str[idx] = '\0';
+	str[idx] = DEF_TELEMETRY_TERMINATOR;
+	str[idx+1] = '\0';
 }
