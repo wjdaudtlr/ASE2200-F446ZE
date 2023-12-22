@@ -177,8 +177,10 @@ void SystemClock_Config(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if (htim == &htim3){
 		IH_TelemetryData_GetString(telemetry_string, &telemetry_data);
-		HAL_UART_Transmit_IT(&huart2, telemetry_string, sizeof(telemetry_string));
-		telemetry_data.PACKET_COUNT++;
+		if(HAL_UART_Transmit_IT(&huart2, telemetry_string, sizeof(telemetry_string))==HAL_OK){
+			telemetry_data.PACKET_COUNT++;
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		}
 	}
 }
 
