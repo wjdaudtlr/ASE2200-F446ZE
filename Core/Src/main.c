@@ -94,7 +94,6 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM3_Init();
-  MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim3);
 
@@ -176,8 +175,9 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 	if (htim == &htim3){
+		IH_UTCTime_AddSecond(&telemetry_data.MISSION_TIME);
 		IH_TelemetryData_GetString(telemetry_string, &telemetry_data);
-		if(HAL_UART_Transmit_IT(&huart2, telemetry_string, sizeof(telemetry_string))==HAL_OK){
+		if(HAL_UART_Transmit_IT(&huart3, telemetry_string, sizeof(telemetry_string))==HAL_OK){
 			telemetry_data.PACKET_COUNT++;
 			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		}
