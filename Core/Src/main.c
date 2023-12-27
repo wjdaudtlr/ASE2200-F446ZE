@@ -15,6 +15,25 @@
   *
   ******************************************************************************
   */
+/*
+ * 코드 설명
+ * 현재 timer 3는 1초에 한번씩 period elapsed callback 함수를 발생시키고 if(htim == &htim3) 블록 내부 실행 중
+ * main()에서 초기화된 telemetry_data 구조체(ih_telemetry.h 참고)를 GetString 함수(ih_telemetry.c 참고)를 이용하여
+ * string 획득한 뒤 이를 uart 통신을 통해 보냄
+ * HAL_UART_Transmit_IT() 함수는 정상적으로 송신 성공시 HAL_OK를 반환하고 packet count 증가
+ * 또한 송신 성공시마다 1번 led가 깜빡거림
+ *
+ * 현재 timer 4는 20ms에 한번씩 서보에 맞게 설정된 PWM 입력을 보내고 있음
+ * 1ms High(켜짐), 19ms Low(꺼짐)시 -90도, 2ms High, 18ms Low시 +90도 임이 데이터시트에 명시되어 있음
+ * 현재 실행 시 충분히 움직이지 않는 모습을 보이며 전원 부족 문제로 추측됨
+ *
+ * 현재 user button(파란색)은 external interrupt를 발생시키도록 설정되어 있음
+ * 버튼을 누르면 HAL_GPIO_EXTI_Callback() 함수가 호출되며, if문을 통해 어떤 핀에 의해 호출되었는지 체크함
+ * 버튼을 한번 누를 때마다 30도씩 각도가 변하도록 되어있음
+ * IH_Servo_Write() 함수를 통해 현재 연결된 서보를 움직일 수 있음
+ * 핀 위치를 바꾸거나 서보를 추가하기 위해서는 약간의 이해가 필요하니 주의할 것
+ * ih_servo.h에 구현 방법이 매우 상세히 설명되어 있으니 참고할 것
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -39,6 +58,11 @@
 /* USER CODE BEGIN PD */
 IH_TelemetryDataTypeDef telemetry_data;
 char telemetry_string[DEF_TELEMETRY_STRING_SIZE];
+
+IH_ServoTypeDef servo;
+int deg = 0;
+int ccr = 1000;
+int isup = 0;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -94,8 +118,11 @@ int main(void)
   MX_USART3_UART_Init();
   MX_USB_OTG_FS_PCD_Init();
   MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim4);
+  HAL_TIM_PWM_Start_IT(&htim4, TIM_CHANNEL_1);
 
   // initializing telemetry data
   strcpy(telemetry_data.STATE, "INITIALIZING");
@@ -113,6 +140,9 @@ int main(void)
   strcpy(telemetry_data.CMD_ECHO, "NO_CMD");
   // optional data initialization
 
+  // initializing servo
+
+  IH_Servo_Attach(&servo, &(htim4.Instance->CCR1));
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -179,8 +209,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		IH_TelemetryData_GetString(telemetry_string, &telemetry_data);
 		if(HAL_UART_Transmit_IT(&huart3, telemetry_string, sizeof(telemetry_string))==HAL_OK){
 			telemetry_data.PACKET_COUNT++;
-			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+			HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 		}
+	}
+	if (htim == &htim4)
+		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+}
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if (GPIO_Pin == USER_Btn_Pin){
+		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+		if (isup == 1){
+			// going up
+			deg += 30;
+			if (deg >= 90){
+				deg = 90;
+				isup = 0;	// let's go down
+			}
+		}
+		else{
+			// going down
+			deg -= 30;
+			if (deg <= -90){
+				deg = -90;
+				isup = 1;	// let's go up
+			}
+		}
+		IH_Servo_Write(&servo, deg);
 	}
 }
 
