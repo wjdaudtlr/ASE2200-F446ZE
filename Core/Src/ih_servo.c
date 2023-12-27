@@ -22,15 +22,21 @@ void IH_Servo_Attach(IH_ServoTypeDef* Servo, volatile uint32_t* CCR_Address){
 	Servo->CCR_Address = CCR_Address;
 }
 void IH_Servo_Write(IH_ServoTypeDef* Servo, int8_t deg){
-	// convert degree to actual CCR value
-	// CCR = 1000 when -90, CCR = 2000 when +90
-	// CCR = 1000/180*deg + 1500
-    int ccr = (float) 1000/180*deg + 1500;
-    if (ccr < 1000){
-    	ccr = 1000;
+	// angle saturation
+	if (deg > (DEF_SERVO_MAX_DEG)){
+		deg = (DEF_SERVO_MAX_DEG);
+	}
+	if (deg < (DEF_SERVO_MIN_DEG)){
+		deg = (DEF_SERVO_MIN_DEG);
+	}
+	// calculate ccr
+    int ccr = (float) ((DEF_SERVO_MAX_PW)-(DEF_SERVO_MIN_PW))/((DEF_SERVO_MAX_DEG)-(DEF_SERVO_MIN_DEG))*(deg - DEF_SERVO_MIN_DEG)+DEF_SERVO_MIN_PW;
+    // pulse width saturation
+    if (ccr < DEF_SERVO_MIN_PW){
+    	ccr = DEF_SERVO_MIN_PW;
     }
-    if (ccr > 2000){
-    	ccr = 2000;
+    if (ccr > DEF_SERVO_MAX_PW){
+    	ccr = DEF_SERVO_MAX_PW;
     }
 	*(Servo->CCR_Address) = ccr - 1;
 }

@@ -64,7 +64,10 @@ typedef struct _IH_ServoTypeDef{
 }IH_ServoTypeDef;
 
 // defines
-
+#define DEF_SERVO_MAX_DEG 90	// unit: degree
+#define DEF_SERVO_MIN_DEG -90
+#define DEF_SERVO_MAX_PW 2400	// unit: microsecond
+#define DEF_SERVO_MIN_PW 544
 // prototypes
 void IH_Servo_Attach(IH_ServoTypeDef* Servo, volatile uint32_t* CCR_Address);
 void IH_Servo_Write(IH_ServoTypeDef* Servo, int8_t deg);
