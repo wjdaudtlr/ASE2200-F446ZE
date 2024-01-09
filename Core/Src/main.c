@@ -220,19 +220,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		if (isup == 1){
 			// going up
-			deg += 30;
-			if (deg >= 90){
-				deg = 90;
-				isup = 0;	// let's go down
-			}
+			deg += 90;
+//			if (deg >= 90){
+//				deg = 90;
+//				isup = 0;	// let's go down
+//			}
+			isup = 0;
 		}
 		else{
 			// going down
-			deg -= 30;
-			if (deg <= -90){
-				deg = -90;
-				isup = 1;	// let's go up
-			}
+			deg -= 90;
+//			if (deg <= -90){
+//				deg = -90;
+//				isup = 1;	// let's go up
+//			}
+			isup = 1;
 		}
 		IH_Servo_Write(&servo, deg);
 	}
