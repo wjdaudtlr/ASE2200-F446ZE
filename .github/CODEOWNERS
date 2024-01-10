@@ -1,0 +1,19 @@
+# 이것은 주석입니다.
+# 담당자를 지정할 때는 github ID 혹은 github email을 넣습니다.
+# 아래부터는 예시입니다.
+
+# 프로젝트 내 모든 디렉토리 및 파일 대상으로 오너를 wjdaudtlr과 HAURCAORI, seungwon4191 세명으로 지정할 경우.
+* @wjdaudtlr @HAURCAORI @seungwon4191
+
+# .h 파일에 관련된 오너로 wjdaudtlr와 HAURCAORI 두명으로 지정 할 경우.
+# *.h @wjdaudtlr @HAURCAORI
+
+# 어느 경로 상관 없이 Core/Src/main.c 경로의 패턴을 가진 파일의 오너를 seungwon4191로 지정할 경우.
+# Core/Src/main.c @seungwon4191
+
+# 레포 내 root의 '/Drivers/'의 하위 디렉토리 전체를 rigel1291로 지정할 경우.
+# /Drivers/ @rigel1291
+
+# 레포 내 root의 '/Core/' 하위 전체를 jeonghyeoklee로 지정하되, '/Core/Inc' 제외할 경우.
+# /Core/ @jeonghyeoklee
+# /Core/Inc
