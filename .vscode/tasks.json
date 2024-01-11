@@ -7,7 +7,7 @@
         {
             "label": "Commit",
             "type": "shell",
-            "command": "git add .; git commit -m HyungJun;git push origin main;",
+            "command": "git add .; git commit -m HyungJun;git push origin master;",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
