@@ -5,6 +5,16 @@
     "runner": "terminal",
     "tasks": [
         {
+            "label": "Task",
+            "type": "shell",
+            "command": "",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
             "label": "Commit",
             "type": "shell",
             "command": "git add .; git commit -m HyungJun;git push origin master;",
