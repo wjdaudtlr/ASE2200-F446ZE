@@ -46,6 +46,7 @@
 /* USER CODE BEGIN Includes */
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
 
 /* USER CODE END Includes */
 
@@ -152,9 +153,9 @@ int main(void)
     /* USER CODE END WHILE */
     
     // Hello
-    
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
